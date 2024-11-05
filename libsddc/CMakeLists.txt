@@ -30,6 +30,19 @@ target_link_libraries(sddc PRIVATE SDDC_CORE)
 set_target_properties(sddc PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(sddc PROPERTIES SOVERSION 0)
 
+add_library(sddc_static STATIC
+    libsddc.cpp
+    ${CMAKE_SOURCE_DIR}/SDDC_FX3/SDDC_FX3.h
+    $<TARGET_OBJECTS:SDDC_CORE>
+)
+set_property(TARGET sddc_static PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/SDDC_FX3/SDDC_FX3.h COMMAND make WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/SDDC_FX3)
+set_property(TARGET sddc_static PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_SOURCE_DIR}/SDDC_FX3/SDDC_FX3.h)
+set_property(TARGET sddc_static  PROPERTY OUTPUT_NAME sddc)
+set_target_properties(sddc_static PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(sddc_static PROPERTIES SOVERSION 0)
+
+
 # applications
 add_executable(sddc_test sddc_test.c)
 target_link_libraries(sddc_test PRIVATE sddc ${ASANLIB})
