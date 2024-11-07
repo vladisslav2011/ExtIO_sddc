@@ -68,17 +68,22 @@ static struct usb_device_id usb_device_ids[] = {
   { 0x04b4, 0x00f1, 0 }      /* Cypress / FX3 Streamer Example */
 };
 static int n_usb_device_ids = sizeof(usb_device_ids) / sizeof(usb_device_ids[0]);
+static libusb_context *ctx = 0;
+static int ctx_use_count = 0;
 
 
 int usb_device_count_devices()
 {
   int ret_val = -1;
 
-  int ret = libusb_init(0);
+  int ret = 0;
+  if(!ctx)
+    ret=libusb_init(&ctx);
   if (ret < 0) {
     log_usb_error(ret, __func__, __FILE__, __LINE__);
     goto FAIL0;
-  }
+  }else
+    ctx_use_count ++;
   libusb_device **list = 0;
   ssize_t nusbdevices = libusb_get_device_list(0, &list);
   if (nusbdevices < 0) {
@@ -102,7 +107,13 @@ int usb_device_count_devices()
   ret_val = count;
 
 FAIL1:
-  libusb_exit(0);
+  if(ctx_use_count)
+    ctx_use_count --;
+  if(ctx && !ctx_use_count)
+  {
+    libusb_exit(ctx);
+    ctx=0;
+  }
 FAIL0:
   return ret_val;
 }
@@ -119,11 +130,14 @@ int usb_device_get_device_list(struct usb_device_info **usb_device_infos)
     goto FAIL0;
   }
 
-  int ret = libusb_init(0);
+  int ret = 0;
+  if(!ctx)
+    ret=libusb_init(&ctx);
   if (ret < 0) {
     log_usb_error(ret, __func__, __FILE__, __LINE__);
     goto FAIL0;
-  }
+  }else
+    ctx_use_count++;
   libusb_device **list = 0;
   ssize_t nusbdevices = libusb_get_device_list(0, &list);
   if (nusbdevices < 0) {
@@ -205,7 +219,13 @@ FAIL3:
 FAIL2:
   libusb_free_device_list(list, 1);
 FAIL1:
-  libusb_exit(0);
+  if(ctx_use_count)
+    ctx_use_count--;
+  if(ctx && !ctx_use_count)
+  {
+    libusb_exit(ctx);
+    ctx=0;
+  }
 FAIL0:
   return ret_val;
 }
@@ -235,13 +255,15 @@ usb_device_t *usb_device_open(int index, const char* image,
                               uint32_t size)
 {
   usb_device_t *ret_val = 0;
-  libusb_context *ctx = 0;
 
-  int ret = libusb_init(&ctx);
+  int ret = 0;
+  if(!ctx)
+    ret=libusb_init(&ctx);
   if (ret < 0) {
     log_usb_error(ret, __func__, __FILE__, __LINE__);
     goto FAIL0;
-  }
+  }else
+    ctx_use_count++;
 
   //libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_DEBUG);
 
@@ -331,7 +353,13 @@ usb_device_t *usb_device_open(int index, const char* image,
 FAIL2:
   libusb_close(dev_handle);
 FAIL1:
-  libusb_exit(0);
+  if(ctx_use_count)
+    ctx_use_count--;
+  if(ctx && !ctx_use_count)
+  {
+    libusb_exit(ctx);
+    ctx=0;
+  }
 FAIL0:
   return ret_val;
 }
@@ -341,7 +369,13 @@ void usb_device_close(usb_device_t *this)
 {
   libusb_close(this->dev_handle);
   free(this);
-  libusb_exit(0);
+  if(ctx_use_count)
+    ctx_use_count--;
+  if(ctx && !ctx_use_count)
+  {
+    libusb_exit(ctx);
+    ctx=0;
+  }
   return;
 }
 
