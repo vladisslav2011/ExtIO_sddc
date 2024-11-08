@@ -85,7 +85,7 @@ int usb_device_count_devices()
   }else
     ctx_use_count ++;
   libusb_device **list = 0;
-  ssize_t nusbdevices = libusb_get_device_list(0, &list);
+  ssize_t nusbdevices = libusb_get_device_list(ctx, &list);
   if (nusbdevices < 0) {
     log_usb_error(nusbdevices, __func__, __FILE__, __LINE__);
     goto FAIL1;
@@ -139,7 +139,7 @@ int usb_device_get_device_list(struct usb_device_info **usb_device_infos)
   }else
     ctx_use_count++;
   libusb_device **list = 0;
-  ssize_t nusbdevices = libusb_get_device_list(0, &list);
+  ssize_t nusbdevices = libusb_get_device_list(ctx, &list);
   if (nusbdevices < 0) {
     log_usb_error(nusbdevices, __func__, __FILE__, __LINE__);
     goto FAIL1;
@@ -588,7 +588,7 @@ static int list_endpoints(struct libusb_endpoint_descriptor endpoints[],
         }
         endpoints[count] = *endpoint;
         struct libusb_ss_endpoint_companion_descriptor *endpoint_ss_companion;
-        ret = libusb_get_ss_endpoint_companion_descriptor(0, endpoint,
+        ret = libusb_get_ss_endpoint_companion_descriptor(ctx, endpoint,
                 &endpoint_ss_companion);
 
         //printf("PktSize=%d\n", endpoint->wMaxPacketSize * (endpoint_ss_companion->bMaxBurst + 1));
