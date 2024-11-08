@@ -41,6 +41,7 @@ include_directories(${CMAKE_BINARY_DIR})
 
 add_library(SDDC_CORE STATIC ${SRC})
 set_target_properties(SDDC_CORE PROPERTIES POSITION_INDEPENDENT_CODE True)
+set_target_properties(SDDC_CORE PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(SDDC_CORE PUBLIC _CRT_SECURE_NO_WARNINGS)
 
 target_include_directories(SDDC_CORE PUBLIC "${LIBFFTW_INCLUDE_DIRS}")

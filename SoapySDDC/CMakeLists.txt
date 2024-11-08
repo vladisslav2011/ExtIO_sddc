@@ -18,9 +18,6 @@ if (SoapySDR_FOUND)
     )
 
     add_dependencies(SDDCSupport SDDC_CORE)
-
-    target_link_libraries(sddc PRIVATE SDDC_CORE)
-    set_target_properties(sddc PROPERTIES VERSION ${PROJECT_VERSION})
-    set_target_properties(sddc PROPERTIES SOVERSION 1)
+    set_target_properties(SDDCSupport PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 endif(SoapySDR_FOUND)
