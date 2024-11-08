@@ -20,6 +20,8 @@ SoapySDR::KwargsList findSDDC(const SoapySDR::Kwargs &args)
         devInfo["label"] = std::string("SDDC") + " :: " + devicelist.dev[idx];
         results.push_back(devInfo);
         idx++;
+        if(idx == MAXNDEV)
+            break;
     }
 
     delete Fx3;
