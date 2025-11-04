@@ -113,6 +113,8 @@ std::vector<std::string> SoapySDDC::listAntennas(const int direction, const size
 
     antennas.push_back("HF");
     antennas.push_back("VHF");
+    antennas.push_back("HF Active");
+    antennas.push_back("VHF Active");
     // i want to list antennas names in dbgprintf
     for (auto &antenna : antennas)
     {
@@ -132,10 +134,24 @@ void SoapySDDC::setAntenna(const int direction, const size_t, const std::string 
     if (name == "HF")
     {
         RadioHandler.UpdatemodeRF(HFMODE);
+        RadioHandler.UpdBiasT_HF(false);
+        RadioHandler.UpdBiasT_VHF(false);
     }
     else if (name == "VHF")
     {
         RadioHandler.UpdatemodeRF(VHFMODE);
+        RadioHandler.UpdBiasT_HF(false);
+        RadioHandler.UpdBiasT_VHF(false);
+    }
+    if (name == "HF Active")
+    {
+        RadioHandler.UpdatemodeRF(HFMODE);
+        RadioHandler.UpdBiasT_HF(true);
+    }
+    else if (name == "VHF Active")
+    {
+        RadioHandler.UpdatemodeRF(VHFMODE);
+        RadioHandler.UpdBiasT_VHF(true);
     }
     else
     {
